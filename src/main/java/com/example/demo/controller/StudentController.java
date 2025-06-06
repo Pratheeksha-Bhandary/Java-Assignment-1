@@ -1,7 +1,7 @@
 package com.example.demo.controller;
 
 import com.example.demo.model.Student;
-import com.example.demo.repository.StudentRepository;
+import com.example.demo.service.StudentService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -12,43 +12,30 @@ import java.util.List;
 public class StudentController {
 
     @Autowired
-    private StudentRepository studentRepository;
+    private StudentService studentService;
 
     @GetMapping
     public List<Student> getAllStudents() {
-        return studentRepository.findAll();
+        return studentService.getAllStudents();
     }
 
     @GetMapping("/{id}")
     public Student getStudentById(@PathVariable int id) {
-        return studentRepository.findById(id).orElse(null);
+        return studentService.getStudentById(id).orElse(null);
     }
 
     @PostMapping
     public String addStudent(@RequestBody Student student) {
-        studentRepository.save(student);
-        return "Student added successfully!";
+        return studentService.addStudent(student);
     }
 
     @PutMapping("/{id}")
     public String updateStudent(@PathVariable int id, @RequestBody Student updatedStudent) {
-        return studentRepository.findById(id).map(student -> {
-            student.setName(updatedStudent.getName());
-            student.setEmail(updatedStudent.getEmail());
-            student.setDepartment(updatedStudent.getDepartment());
-            student.setGpa(updatedStudent.getGpa());
-            studentRepository.save(student);
-            return "Student updated successfully!";
-        }).orElse("Student not found!");
+        return studentService.updateStudent(id, updatedStudent);
     }
 
     @DeleteMapping("/{id}")
     public String deleteStudent(@PathVariable int id) {
-        if (studentRepository.existsById(id)) {
-            studentRepository.deleteById(id);
-            return "Student deleted!";
-        } else {
-            return "Student not found!";
-        }
+        return studentService.deleteStudent(id);
     }
 }
